@@ -1,0 +1,1 @@
+ATTRS{name}=="Goodix Capacitive TouchScreen", ENV{LIBINPUT_CALIBRATION_MATRIX}="5.2 0 0 0 3.2 0 0 0 1"
