@@ -170,6 +170,8 @@ actions:
       - alsa-ucm-conf
       - alsa-utils
       - clinfo
+      # used to debug clock issues
+      - debugcc
       - device-tree-compiler
       - docker.io
       - i2c-tools
