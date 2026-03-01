@@ -1,5 +1,8 @@
 # DEBOS_OPTS can be overridden with:
 #     make DEBOS_OPTS=... all
+# USE_CONTAINER can be set to yes/no/auto (default: auto)
+#     make USE_CONTAINER=yes all    # Force container use
+#     make USE_CONTAINER=no all     # Force native debos
 
 # To build large images, the debos resource defaults are not sufficient. These
 # provide defaults that work for us as universally as we can manage.
@@ -16,13 +19,13 @@ export http_proxy
 all: disk-ufs.img.gz disk-sdcard.img.gz
 
 rootfs.tar: debos-recipes/qualcomm-linux-debian-rootfs.yaml
-	$(DEBOS) $<
+	$(DEBOS_CMD) $<
 
 disk-ufs.img disk-ufs.img.gz: debos-recipes/qualcomm-linux-debian-image.yaml rootfs.tar
-	$(DEBOS) $<
+	$(DEBOS_CMD) $<
 
 disk-sdcard.img.gz: debos-recipes/qualcomm-linux-debian-image.yaml rootfs.tar
-	$(DEBOS) -t imagetype:sdcard $<
+	$(DEBOS_CMD) -t imagetype:sdcard $<
 
 .PHONY: test
 test: disk-ufs.img
