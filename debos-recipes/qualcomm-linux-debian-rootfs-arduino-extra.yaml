@@ -186,6 +186,7 @@ actions:
       - arduino-router
       - arduino-app-lab
       - arduino-cli
+      - onboard
 
   - action: run
     description: Pre-install the core for the micro
