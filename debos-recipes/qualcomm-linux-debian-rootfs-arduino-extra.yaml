@@ -193,13 +193,7 @@ actions:
     command: |
       export ARDUINO_DIRECTORIES_DATA=/home/arduino/.arduino15 \
       && arduino-cli core install arduino:zephyr \
-      && arduino-cli cache clean \
-      && arduino-cli lib download MsgPack@0.4.2 \
-      && arduino-cli lib download DebugLog@0.8.4 \
-      && arduino-cli lib download ArxContainer@0.7.0 \
-      && arduino-cli lib download ArxTypeTraits@0.3.2 \
-      && arduino-cli lib download Arduino_RPClite \
-      && arduino-cli lib download Arduino_RouterBridge
+      && arduino-cli cache clean
 
   - action: run
     description: Optimize toolchain
@@ -264,8 +258,9 @@ actions:
       sleep 10
       /usr/sbin/dockerd --containerd=/run/containerd/containerd.sock --iptables=false --bridge=none &
       sleep 20
-      export ARDUINO_APP_CLI__ALLOW_ROOT=true && \
-        /usr/bin/arduino-app-cli system init
+      export ARDUINO_DIRECTORIES_DATA=/home/arduino/.arduino15 \
+      && export ARDUINO_APP_CLI__ALLOW_ROOT=true \
+      && /usr/bin/arduino-app-cli system init
       rm -rf /home/arduino/.docker
 {{- end }}
 
