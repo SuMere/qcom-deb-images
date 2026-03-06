@@ -13,28 +13,41 @@ diff -Nru android-platform-tools-34.0.5/debian/adbd.service android-platform-too
 diff -Nru android-platform-tools-34.0.5/debian/bin/adbd-usb-gadget android-platform-tools-34.0.5/debian/bin/adbd-usb-gadget
 --- android-platform-tools-34.0.5/debian/bin/adbd-usb-gadget	2025-04-04 06:03:19.000000000 +0000
 +++ android-platform-tools-34.0.5/debian/bin/adbd-usb-gadget	2025-08-25 10:08:19.000000000 +0000
-@@ -2,6 +2,20 @@
- 
- set -e
- 
-+
-+BOARD_MODEL=$(cat /sys/class/dmi/id/product_name)
-+
-+if [ "$BOARD_MODEL" = "Imola" ]; then
-+	ID_PRODUCT=0x0078
-+	ID_VENDOR=0x2341
-+	SERIAL_NUMBER_CMD="cat /sys/devices/soc0/serial_number"
-+else
-+	# unrecognized board, set adb original values
-+	ID_PRODUCT=0x0100
-+	ID_VENDOR=0x18D1
-+	SERIAL_NUMBER_CMD="sha256sum /etc/machine-id | cut -d' ' -f1"
+@@ -1,5 +1,33 @@
+ #!/bin/sh
+
++DMI_PATH="/sys/class/dmi/id/product_name"
++DT_PATH="/sys/firmware/devicetree/base/compatible"
++if [ -f "$DMI_PATH" ]; then
++       BOARD_MODEL=$(cat "$DMI_PATH")
++elif [ -f "$DT_PATH" ]; then
++       BOARD_MODEL=$(cat "$DT_PATH" | tr '\0' ' ' | cut -d' ' -f1 | cut -d',' -f2)
 +fi
++case "$BOARD_MODEL" in
++  "Imola"*|"imola"*)
++       ID_PRODUCT=0x0078
++       ID_VENDOR=0x2341
++       BOARD_NAME="UNO Q"
++       SERIAL_NUMBER_CMD="cat /sys/devices/soc0/serial_number"
++       ;;
++  "Monza"*|"monza"*)
++       ID_PRODUCT=0x007A
++       ID_VENDOR=0x2341
++       BOARD_NAME="VENTUNO Q"
++       SERIAL_NUMBER_CMD="cat /sys/devices/soc0/serial_number"
++       ;;
++  *)
++       # unrecognized board, set adb original values
++       ID_PRODUCT=0x0100
++       ID_VENDOR=0x18D1
++       SERIAL_NUMBER_CMD="sha256sum /etc/machine-id | cut -d' ' -f1"
++       ;;
++esac
 +
+ set -e
+
  UDC="${ADBD_GADGET_UDC}"
- if [ "${UDC}" ] && [ ! -e "/sys/class/udc/${UDC}" ]
- then
-@@ -31,13 +45,13 @@
+@@ -31,13 +55,13 @@
      mkdir -p strings/0x409
      mkdir -p configs/c.1/strings/0x409
  
@@ -46,19 +59,19 @@ diff -Nru android-platform-tools-34.0.5/debian/bin/adbd-usb-gadget android-platf
 -    echo "Debian" > strings/0x409/manufacturer
 -    echo "ADB device" > strings/0x409/product
 +    echo "Arduino" > strings/0x409/manufacturer
-+    echo "Uno Q - $(cat /etc/hostname)" > strings/0x409/product
++    echo "${BOARD_NAME} - $(cat /etc/hostname)" > strings/0x409/product
      # Derive the serial number from the machine-id so it's unique
 -    echo "$(sha256sum < /etc/machine-id | cut -d' ' -f1)" > strings/0x409/serialnumber
 +    echo "$(eval ${SERIAL_NUMBER_CMD})" > strings/0x409/serialnumber
  
      echo "ADB Configuration" > configs/c.1/strings/0x409/configuration
      echo 120 > configs/c.1/MaxPower
-@@ -48,11 +62,17 @@
+@@ -48,11 +72,17 @@
  
      # Mount FunctionFS where adbd expects it
      mkdir -p /dev/usb-ffs/adb
 -    mount -t functionfs adb /dev/usb-ffs/adb
-+    mount -t functionfs adb /dev/usb-ffs/adb -o uid=1000,gid=1000 
++    mount -t functionfs adb /dev/usb-ffs/adb -o uid=1000,gid=1000
 + 
 +    # create the acm (serial) function with unique name
 +    mkdir -p functions/acm.GS0
@@ -72,7 +85,7 @@ diff -Nru android-platform-tools-34.0.5/debian/bin/adbd-usb-gadget android-platf
      echo "${UDC}" > ${CONFIGFS_DIR}/UDC
  }
  
-@@ -60,6 +80,7 @@
+@@ -60,6 +90,7 @@
      umount /dev/usb-ffs/adb
      rmdir /dev/usb-ffs/adb
      rm ${CONFIGFS_DIR}/configs/c.1/ffs.adb
@@ -84,7 +97,7 @@ diff -Nru android-platform-tools-34.0.5/debian/changelog android-platform-tools-
 --- android-platform-tools-34.0.5/debian/changelog	2025-04-04 06:03:19.000000000 +0000
 +++ android-platform-tools-34.0.5/debian/changelog	2025-08-25 10:08:19.000000000 +0000
 @@ -1,3 +1,10 @@
-+android-platform-tools (34.0.5-12arduino5) unstable; urgency=medium
++android-platform-tools (34.0.5-12arduino7) unstable; urgency=medium
 +
 +  * adbd:
 +    - Remove root and switch to bash
@@ -152,7 +165,7 @@ diff -Nru android-platform-tools-34.0.5/debian/patches/adbd/adbd-drop-root.patch
 ++        return 1;
 ++    }
 ++
-++    if (setgid(1000) != 0) {
+++    if (setgid(pw->pw_gid) != 0) {
 ++        exit(1);
 ++    }
 ++    if (setuid(1000) != 0) {
