@@ -6,7 +6,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.ARDUINOBOT_TOKEN }}
   GITHUB_USERNAME: ArduinoBot
   GIT_REPO_KERNEL: https://github.com/arduino/linux-qcom
-  GIT_BRANCH_KERNEL: qcom-v6.16.7-unoq
+  GIT_BRANCH_KERNEL: qcom-v6.19.0-unoq
   GIT_REPO_UBOOT: https://github.com/arduino/u-boot
   DEVICE_TREE_UBOOT: qcom/qrb2210-arduino-imola
   OVERLAYS: arduino-unoq-releases,apt-sources,backports,qsc-deb-releases
