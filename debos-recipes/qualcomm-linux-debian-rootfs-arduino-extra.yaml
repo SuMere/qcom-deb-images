@@ -298,6 +298,15 @@ actions:
       update-alternatives --set regulatory.db /lib/firmware/regulatory.db-upstream
 
   - action: run
+    description: Enable systemd extra units
+    chroot: true
+    command: |
+      set -eux
+      # enable extra unit
+      systemctl enable remoteproc_audio_fixup
+      systemctl enable key_events
+
+  - action: run
     description: update systemd timesync clock
     chroot: true
     command: |
