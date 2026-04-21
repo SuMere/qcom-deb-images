@@ -117,6 +117,7 @@ jobs:
           name: kernel-and-uboot
           path: |
             linux-image-*.deb
+            linux-headers-*.deb
             rb1-boot.img
         if: ${{ github.event.inputs.compile_kernel == 'true' }}
 
