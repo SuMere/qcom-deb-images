@@ -182,10 +182,7 @@ actions:
       - libwebkitgtk-doc=2.48.3-1qcom1
       - webkit2gtk-driver=2.48.3-1qcom1
       - webkitgtk-webdriver=2.48.3-1qcom1
-      - arduino-app-cli
-      - arduino-router
-      - arduino-app-lab
-      - arduino-cli
+      - arduino-unoq
       - onboard
 
   - action: run
