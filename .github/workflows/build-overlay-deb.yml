@@ -33,7 +33,7 @@ jobs:
           DEBIAN_FRONTEND=noninteractive apt -y full-upgrade
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install sbuild and dependencies
         run: |
@@ -97,7 +97,7 @@ jobs:
               --config "$CONFIG" --output-dir upload
 
       - name: Authenticate AWS
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: "us-east-1"
           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
