@@ -2,7 +2,7 @@
 
 handle_no_soundcard() {
     logger -t remoteproc-check "No sound cards found via alsaucm. Attempting remoteproc restart..."
-    if cat /sys/class/remoteproc/remoteproc1/state | grep -q "running"; then
+    if grep -q "running" /sys/class/remoteproc/remoteproc1/state; then
         logger -t remoteproc-check "Remoteproc is currently running. Stopping it before restart."
         echo stop > /sys/class/remoteproc/remoteproc1/state
     else
