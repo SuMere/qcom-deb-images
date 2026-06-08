@@ -1,0 +1,538 @@
+diff -Nru alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.install alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.install
+--- alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.install	2024-07-01 11:12:29.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.install	2026-05-07 21:00:46.000000000 +0000
+@@ -1 +1,3 @@
+ ucm* usr/share/alsa
++debian/remoteproc_audio_fixup.service etc/systemd/system/
++debian/scripts/restart_remoteproc_audio.sh  opt/arduino/scripts/
+diff -Nru alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.postinst alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.postinst
+--- alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.postinst	1970-01-01 00:00:00.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/alsa-ucm-conf.postinst	2026-05-07 21:00:46.000000000 +0000
+@@ -0,0 +1,7 @@
++#!/bin/sh
++
++chmod a+x /opt/arduino/scripts/restart_remoteproc_audio.sh
++systemctl enable remoteproc_audio_fixup.service
++
++#DEBHELPER#
++exit 0
+diff -Nru alsa-ucm-conf-1.2.14/debian/changelog alsa-ucm-conf-1.2.14/debian/changelog
+--- alsa-ucm-conf-1.2.14/debian/changelog	2025-04-14 18:40:01.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/changelog	2026-05-07 21:02:35.000000000 +0000
+@@ -1,3 +1,12 @@
++alsa-ucm-conf (1.2.14-1qcom0.1arduino3) UNRELEASED; urgency=medium
++
++  [ Arduino Dev Team ]
++  * Apply the qcom patches (Glymur support) to the alsa-ucm package.
++  * Apply arduino ucm2 configurations.
++  * Add sound fixes.
++
++ -- Arduino Dev Team <dev@arduino.cc>  Thu, 07 May 2026 21:02:35 +0000
++
+ alsa-ucm-conf (1.2.14-1) unstable; urgency=medium
+ 
+   * New upstream release.
+diff -Nru alsa-ucm-conf-1.2.14/debian/patches/0004-apply-qcom0.1.patch alsa-ucm-conf-1.2.14/debian/patches/0004-apply-qcom0.1.patch
+--- alsa-ucm-conf-1.2.14/debian/patches/0004-apply-qcom0.1.patch	1970-01-01 00:00:00.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/patches/0004-apply-qcom0.1.patch	2026-05-07 20:59:29.000000000 +0000
+@@ -0,0 +1,86 @@
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/glymur/GLYMUR-CRD.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/glymur/GLYMUR-CRD.conf
++@@ -0,0 +1,11 @@
+++Syntax 4
+++
+++SectionUseCase."HiFi" {
+++	File "/Qualcomm/glymur/HiFi.conf"
+++	Comment "HiFi quality Music."
+++}
+++
+++Include.card-init.File "/lib/card-init.conf"
+++Include.ctl-remap.File "/lib/ctl-remap.conf"
+++Include.wsa-init.File "/codecs/wsa884x/four-speakers/init.conf"
+++Include.wsam-init.File "/codecs/qcom-lpass/wsa-macro/four-speakers/init.conf"
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/glymur/HiFi.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/glymur/HiFi.conf
++@@ -0,0 +1,49 @@
+++# Use case configuration for X1E80100.
+++# Author: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+++
+++SectionVerb {
+++	EnableSequence [
+++		cset "name='WSA_CODEC_DMA_RX_0 Audio Mixer MultiMedia1' 1"
+++		cset "name='MultiMedia2 Mixer VA_CODEC_DMA_TX_0' 1"
+++	]
+++
+++	Include.wsae.File "/codecs/wsa884x/four-speakers/DefaultEnableSeq.conf"
+++	Include.wsm1e.File "/codecs/qcom-lpass/wsa-macro/Wsa1SpeakerEnableSeq.conf"
+++	Include.wsm2e.File "/codecs/qcom-lpass/wsa-macro/Wsa2SpeakerEnableSeq.conf"
+++
+++	Value {
+++		TQ "HiFi"
+++	}
+++}
+++
+++SectionDevice."Speaker" {
+++	Comment "Speaker playback"
+++
+++	Include.wsmspk1e.File "/codecs/qcom-lpass/wsa-macro/Wsa1SpeakerEnableSeq.conf"
+++	Include.wsmspk2e.File "/codecs/qcom-lpass/wsa-macro/Wsa2SpeakerEnableSeq.conf"
+++	Include.wsmspk1d.File "/codecs/qcom-lpass/wsa-macro/Wsa1SpeakerDisableSeq.conf"
+++	Include.wsmspk2d.File "/codecs/qcom-lpass/wsa-macro/Wsa2SpeakerDisableSeq.conf"
+++	Include.wsaspk.File "/codecs/wsa884x/four-speakers/SpeakerSeq.conf"
+++
+++	Value {
+++		PlaybackChannels 4
+++		PlaybackPriority 100
+++		PlaybackPCM "hw:${CardId},0"
+++		PlaybackMixer "default:${CardId}"
+++		PlaybackMixerElem "Speakers"
+++	}
+++}
+++
+++SectionDevice."Mic" {
+++	Comment "Internal microphones"
+++
+++	Include.vadm0e.File "/codecs/qcom-lpass/va-macro/DMIC0EnableSeq.conf"
+++	Include.vadm0d.File "/codecs/qcom-lpass/va-macro/DMIC0DisableSeq.conf"
+++	Include.vadm1e.File "/codecs/qcom-lpass/va-macro/DMIC1EnableSeq.conf"
+++	Include.vadm1d.File "/codecs/qcom-lpass/va-macro/DMIC1DisableSeq.conf"
+++
+++	Value {
+++		CapturePriority 100
+++		CapturePCM "hw:${CardId},1"
+++	}
+++}
++Index: alsa-ucm-conf-1.2.14/ucm2/conf.d/glymur/GLYMUR-CRD.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/conf.d/glymur/GLYMUR-CRD.conf
++@@ -0,0 +1,11 @@
+++Syntax 4
+++
+++SectionUseCase."HiFi" {
+++	File "/Qualcomm/glymur/HiFi.conf"
+++	Comment "HiFi quality Music."
+++}
+++
+++Include.card-init.File "/lib/card-init.conf"
+++Include.ctl-remap.File "/lib/ctl-remap.conf"
+++Include.wsa-init.File "/codecs/wsa884x/four-speakers/init.conf"
+++Include.wsam-init.File "/codecs/qcom-lpass/wsa-macro/four-speakers/init.conf"
+diff -Nru alsa-ucm-conf-1.2.14/debian/patches/0005-apply-arduino-config.patch alsa-ucm-conf-1.2.14/debian/patches/0005-apply-arduino-config.patch
+--- alsa-ucm-conf-1.2.14/debian/patches/0005-apply-arduino-config.patch	1970-01-01 00:00:00.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/patches/0005-apply-arduino-config.patch	2026-05-07 20:59:29.000000000 +0000
+@@ -0,0 +1,364 @@
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Arduino-Imola.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Arduino-Imola.conf
++@@ -0,0 +1,21 @@
+++Syntax 3
+++
+++SectionUseCase."Headphones" {
+++	File "/Qualcomm/qcm2290/Headphones.conf"
+++	Comment "Headphones"
+++}
+++
+++SectionUseCase."LineOut" {
+++	File "/Qualcomm/qcm2290/Lineout.conf"
+++	Comment "Line out"
+++}
+++
+++SectionUseCase."Earphones" {
+++	File "/Qualcomm/qcm2290/Earphones.conf"
+++	Comment "Earphones"
+++}
+++
+++SectionUseCase."HDMI" {
+++	File "/Qualcomm/qcm2290/HDMI.conf"
+++	Comment "HDMI"
+++}
++\ No newline at end of file
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Earphones.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Earphones.conf
++@@ -0,0 +1,33 @@
+++# Use case configuration for Arduino-Imola board.
+++# Author: Riccardo Mereu <r.mereu@arduino.cc>
+++
+++SectionVerb {
+++
+++	EnableSequence [
+++		cset "name='RX_CODEC_DMA_RX_0 Audio Mixer MultiMedia2' 1"
+++
+++	]
+++
+++	DisableSequence [
+++		cset "name='RX_CODEC_DMA_RX_0 Audio Mixer MultiMedia2' 0"
+++	]
+++
+++	Value {
+++		TQ "HiFi"
+++	}
+++}
+++
+++SectionDevice."Earphones" {
+++	Comment "Earphones playback"
+++
+++	Include.wcdhpe.File "/codecs/pm4125/EarphoneEnableSeq.conf"
+++	Include.wcdhpd.File "/codecs/pm4125/EarphoneDisableSeq.conf"
+++	Include.rxmhpe.File "/codecs/qcom-lpass/rx-macro/HeadphoneLEnableSeq.conf"
+++	Include.rxmhpd.File "/codecs/qcom-lpass/rx-macro/HeadphoneLDisableSeq.conf"
+++
+++	Value {
+++		PlaybackPriority 200
+++		PlaybackPCM "hw:${CardId},1"
+++		PlaybackMixer "hw:${CardId}"
+++	}
+++}
++\ No newline at end of file
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/HDMI.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/HDMI.conf
++@@ -0,0 +1,25 @@
+++# Author: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
+++
+++SectionVerb {
+++	EnableSequence [
+++		cset "name='SEC_MI2S_RX Audio Mixer MultiMedia4' 1"
+++	]
+++
+++	DisableSequence [
+++		cset "name='SEC_MI2S_RX Audio Mixer MultiMedia4' 0"
+++	]
+++
+++	Value {
+++		TQ "HiFi"
+++	}
+++}
+++
+++SectionDevice."HDMI" {
+++	#Name "HDMI"
+++	Comment "HDMI Digital Stereo Output"
+++
+++	Value {
+++		PlaybackPCM "hw:${CardId},3"
+++		PlaybackPriority 200
+++	}
+++}
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Headphones.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Headphones.conf
++@@ -0,0 +1,65 @@
+++# Use case configuration for Arduino-Imola board.
+++# Author: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
+++# Author: Riccardo Mereu <r.mereu@arduino.cc>
+++
+++SectionVerb {
+++
+++	EnableSequence [
+++		cset "name='RX_CODEC_DMA_RX_0 Audio Mixer MultiMedia1' 1"
+++		cset "name='MultiMedia3 Mixer TX_CODEC_DMA_TX_3' 1"
+++	]
+++
+++	DisableSequence [
+++		cset "name='RX_CODEC_DMA_RX_0 Audio Mixer MultiMedia1' 0"
+++		cset "name='MultiMedia3 Mixer TX_CODEC_DMA_TX_3' 0"
+++	]
+++
+++	Value {
+++		TQ "HiFi"
+++	}
+++}
+++
+++SectionDevice."Headphones" {
+++	Comment "Headphones playback"
+++
+++	Include.wcdhpe.File "/codecs/pm4125/HeadphoneEnableSeq.conf"
+++	Include.wcdhpd.File "/codecs/pm4125/HeadphoneDisableSeq.conf"
+++	Include.rxmhpe.File "/codecs/qcom-lpass/rx-macro/HeadphoneEnableSeq.conf"
+++	Include.rxmhpd.File "/codecs/qcom-lpass/rx-macro/HeadphoneDisableSeq.conf"
+++
+++	Value {
+++		PlaybackPriority 200
+++		PlaybackPCM "hw:${CardId},0"
+++		PlaybackMixer "hw:${CardId}"
+++		PlaybackMixerElem "RX_RX0 Digital"
+++		PlaybackMixerElem "RX_RX1 Digital"
+++		#JackControl "Headphone Jack"
+++	}
+++}
+++
+++SectionDevice."Headset" {
+++	Comment "Headset microphone"
+++
+++	Include.wcdmice.File "/codecs/pm4125/HeadphoneMicEnableSeq.conf"
+++	Include.wcdmicd.File "/codecs/pm4125/HeadphoneMicDisableSeq.conf"
+++	Include.txmhpe.File "/codecs/qcom-lpass/tx-macro/SoundwireMic1EnableSeq.conf"
+++	Include.txmhpd.File "/codecs/qcom-lpass/tx-macro/SoundwireMicDisableSeq.conf"
+++
+++	EnableSequence [
+++		cset "name='ADC2 Volume' 0"
+++		cset "name='TX_DEC0 Volume' 80"
+++	]
+++
+++	DisableSequence [
+++		cset "name='TX_DEC0 Volume' 0"
+++	]
+++
+++	Value {
+++		CapturePriority 200
+++		CapturePCM "hw:${CardId},2"
+++		CaptureMixer "hw:${CardId}"
+++		CaptureMixerElem "TX_DEC0"
+++		CaptureVolume "TX_DEC0 Volume"
+++		#JackControl "Mic Jack"
+++	}
+++}
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Lineout.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/Lineout.conf
++@@ -0,0 +1,34 @@
+++# Use case configuration for Arduino-Imola board.
+++# Author: Srinivas Kandagatla <srinivas.kandagatla@oss.qualcomm.com>
+++# Author: Riccardo Mereu <r.mereu@arduino.cc>
+++
+++SectionVerb {
+++
+++	EnableSequence [
+++		cset "name='RX_CODEC_DMA_RX_0 Audio Mixer MultiMedia2' 1"
+++
+++	]
+++
+++	DisableSequence [
+++		cset "name='RX_CODEC_DMA_RX_0 Audio Mixer MultiMedia2' 0"
+++	]
+++
+++	Value {
+++		TQ "HiFi"
+++	}
+++}
+++
+++SectionDevice."LineOut" {
+++	Comment "Lineout playback"
+++
+++	Include.wcdhpe.File "/codecs/pm4125/LineoutEnableSeq.conf"
+++	Include.wcdhpd.File "/codecs/pm4125/LineoutDisableSeq.conf"
+++	Include.rxmhpe.File "/codecs/qcom-lpass/rx-macro/HeadphoneLEnableSeq.conf"
+++	Include.rxmhpd.File "/codecs/qcom-lpass/rx-macro/HeadphoneLDisableSeq.conf"
+++
+++	Value {
+++		PlaybackPriority 200
+++		PlaybackPCM "hw:${CardId},1"
+++		PlaybackMixer "hw:${CardId}"
+++	}
+++}
++Index: alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/qcm2290.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/Qualcomm/qcm2290/qcm2290.conf
++@@ -0,0 +1,12 @@
+++Syntax 4
+++
+++Define.DMI_info "${sys:devices/virtual/dmi/id/board_vendor}-${sys:devices/virtual/dmi/id/product_name}-${sys:devices/virtual/dmi/id/board_name}"
+++
+++If.ArduinoImola {
+++	Condition {
+++		Type RegexMatch
+++		String "${var:DMI_info}"
+++		Regex "arduino-Imola*"
+++	}
+++	True.Include.imola.File "/Qualcomm/qcm2290/Arduino-Imola.conf"
+++}
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/EarphoneDisableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/EarphoneDisableSeq.conf
++@@ -0,0 +1,4 @@
+++DisableSequence [
+++	cset "name='EAR_RDAC Switch' 0"
+++	cset "name='HPHL Switch' 0"
+++]
++\ No newline at end of file
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/EarphoneEnableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/EarphoneEnableSeq.conf
++@@ -0,0 +1,4 @@
+++EnableSequence [
+++	cset "name='EAR_RDAC Switch' 1"
+++	cset "name='HPHL Switch' 1"
+++]
++\ No newline at end of file
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneDisableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneDisableSeq.conf
++@@ -0,0 +1,8 @@
+++DisableSequence [
+++	cset "name='HPHL_RDAC Switch' 0"
+++	cset "name='HPHR_RDAC Switch' 0"
+++	cset "name='HPHL_COMP Switch' 0"
+++	cset "name='HPHR_COMP Switch' 0"
+++	cset "name='HPHL Switch' 0"
+++	cset "name='HPHR Switch' 0"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneEnableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneEnableSeq.conf
++@@ -0,0 +1,8 @@
+++EnableSequence [
+++	cset "name='HPHL_RDAC Switch' 1"
+++	cset "name='HPHR_RDAC Switch' 1"
+++	cset "name='HPHL_COMP Switch' 1"
+++	cset "name='HPHR_COMP Switch' 1"
+++	cset "name='HPHL Switch' 1"
+++	cset "name='HPHR Switch' 1"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneMicDisableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneMicDisableSeq.conf
++@@ -0,0 +1,4 @@
+++DisableSequence [
+++	cset "name='ADC2_MIXER Switch' 0"
+++	cset "name='ADC2 Switch' 0"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneMicEnableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/HeadphoneMicEnableSeq.conf
++@@ -0,0 +1,5 @@
+++EnableSequence [
+++	cset "name='ADC2_MIXER Switch' 1"
+++	cset "name='ADC2 MUX' INP2"
+++	cset "name='ADC2 Switch' 1"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/LineoutDisableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/LineoutDisableSeq.conf
++@@ -0,0 +1,4 @@
+++DisableSequence [
+++	cset "name='LO_RDAC Switch' 0"
+++	cset "name='HPHL Switch' 0"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/LineoutEnableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/pm4125/LineoutEnableSeq.conf
++@@ -0,0 +1,4 @@
+++EnableSequence [
+++	cset "name='LO_RDAC Switch' 1"
+++	cset "name='HPHL Switch' 1"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneDisableSeq.conf
++===================================================================
++--- alsa-ucm-conf-1.2.14.orig/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneDisableSeq.conf
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneDisableSeq.conf
++@@ -7,5 +7,4 @@ DisableSequence [
++ 	cset "name='RX INT1 DEM MUX' NORMAL_DSM_OUT"
++ 	cset "name='RX_COMP1 Switch' 0"
++ 	cset "name='RX_COMP2 Switch' 0"
++-	cset "name='RX HPH Mode' CLS_H_INVALID"
++ ]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneEnableSeq.conf
++===================================================================
++--- alsa-ucm-conf-1.2.14.orig/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneEnableSeq.conf
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneEnableSeq.conf
++@@ -1,6 +1,4 @@
++-EnableSequence [
++-	cset "name='RX_HPH PWR Mode' LOHIFI"
++-	cset "name='RX HPH Mode' CLS_H_ULP"
+++ EnableSequence [
++ 	cset "name='RX_MACRO RX0 MUX' AIF1_PB"
++ 	cset "name='RX_MACRO RX1 MUX' AIF1_PB"
++ 	cset "name='RX INT0_1 MIX1 INP0' RX0"
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneLDisableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneLDisableSeq.conf
++@@ -0,0 +1,5 @@
+++DisableSequence [
+++	cset "name='RX_MACRO RX0 MUX' ZERO"
+++	cset "name='RX INT0_1 MIX1 INP0' ZERO"
+++	cset "name='RX INT0 DEM MUX' NORMAL_DSM_OUT"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneLEnableSeq.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/codecs/qcom-lpass/rx-macro/HeadphoneLEnableSeq.conf
++@@ -0,0 +1,5 @@
+++EnableSequence [
+++	cset "name='RX_MACRO RX0 MUX' 1"
+++	cset "name='RX INT0_1 MIX1 INP0' RX0"
+++	cset "name='RX INT0 DEM MUX' 1"
+++]
++Index: alsa-ucm-conf-1.2.14/ucm2/conf.d/qcm2290/qcm2290.conf
++===================================================================
++--- /dev/null
+++++ alsa-ucm-conf-1.2.14/ucm2/conf.d/qcm2290/qcm2290.conf
++@@ -0,0 +1,12 @@
+++Syntax 4
+++
+++Define.DMI_info "${sys:devices/virtual/dmi/id/board_vendor}-${sys:devices/virtual/dmi/id/product_name}-${sys:devices/virtual/dmi/id/board_name}"
+++
+++If.ArduinoImola {
+++	Condition {
+++		Type RegexMatch
+++		String "${var:DMI_info}"
+++		Regex "Arduino-Imola*"
+++	}
+++	True.Include.imola.File "/Qualcomm/qcm2290/Arduino-Imola.conf"
+++}
+diff -Nru alsa-ucm-conf-1.2.14/debian/patches/series alsa-ucm-conf-1.2.14/debian/patches/series
+--- alsa-ucm-conf-1.2.14/debian/patches/series	2025-04-14 18:39:37.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/patches/series	2026-05-07 20:59:29.000000000 +0000
+@@ -1,3 +1,5 @@
+ 0001-ucm2-add-PinePhone-configuration.patch
+ 0002-ucm2-add-PineTab-configuration.patch
+ 0003-ucm2-add-improved-Librem-5-profiles.patch
++0004-apply-qcom0.1.patch
++0005-apply-arduino-config.patch
+diff -Nru alsa-ucm-conf-1.2.14/debian/remoteproc_audio_fixup.service alsa-ucm-conf-1.2.14/debian/remoteproc_audio_fixup.service
+--- alsa-ucm-conf-1.2.14/debian/remoteproc_audio_fixup.service	1970-01-01 00:00:00.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/remoteproc_audio_fixup.service	2026-05-07 21:01:19.000000000 +0000
+@@ -0,0 +1,10 @@
++[Unit]
++Description=Restarts remoteproc if audio load is failing
++Before=sound.target
++
++[Service]
++Type=oneshot
++ExecStart=/opt/arduino/scripts/restart_remoteproc_audio.sh
++
++[Install]
++WantedBy=basic.target
+diff -Nru alsa-ucm-conf-1.2.14/debian/scripts/restart_remoteproc_audio.sh alsa-ucm-conf-1.2.14/debian/scripts/restart_remoteproc_audio.sh
+--- alsa-ucm-conf-1.2.14/debian/scripts/restart_remoteproc_audio.sh	1970-01-01 00:00:00.000000000 +0000
++++ alsa-ucm-conf-1.2.14/debian/scripts/restart_remoteproc_audio.sh	2026-05-07 21:02:13.000000000 +0000
+@@ -0,0 +1,18 @@
++#!/bin/bash
++
++handle_no_soundcard() {
++    logger -t remoteproc-check "No sound cards found via alsaucm. Attempting remoteproc restart..."
++    if grep -q "running" /sys/class/remoteproc/remoteproc1/state; then
++        logger -t remoteproc-check "Remoteproc is currently running. Stopping it before restart."
++        echo stop > /sys/class/remoteproc/remoteproc1/state
++    else
++    echo -n qcom/qcm2290/adsp.mbn > /sys/class/remoteproc/remoteproc1/firmware
++    fi
++    echo start > /sys/class/remoteproc/remoteproc1/state
++}
++
++if alsaucm listcards 2>/dev/null | grep -q "list is empty"; then
++    handle_no_soundcard
++else
++    logger -t remoteproc-check "Sound cards found via alsaucm. No need to restart remoteproc."
++fi
+\ No newline at end of file
