@@ -1,0 +1,5 @@
+dsc_url: "http://deb.debian.org/debian/pool/main/a/alsa-ucm-conf/alsa-ucm-conf_1.2.14-1.dsc"
+dsc_sha256sum: "783236576e0323efef1d4735a8ee4d11e6adc90d9486066b3ada18034b76b258"
+debdiff_file: "alsa-ucm-conf_1.2.14-1qcom0.1arduino3.debdiff"
+suite: "trixie"
+
