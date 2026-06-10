@@ -68,7 +68,7 @@ jobs:
           apt install -y debos mtools
           # TEMPORARY: get a recent debos version until the next release
           apt install -y git golang libglib2.0-dev libostree-dev libostree-1-1
-          git clone -b action-standalone-partitions https://github.com/facchinm/debos.git
+          git clone -b riccardo/standalone_into_partition https://github.com/SuMere/debos.git
           cd debos && go build ./cmd/debos
           mv debos /usr/local/bin/debos
 
