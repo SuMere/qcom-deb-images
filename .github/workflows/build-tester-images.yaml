@@ -162,6 +162,7 @@ jobs:
               -t "buildid:${{ steps.buildtag.outputs.BUILD_ID }}" \
               -t includecontainers:${{ env.INCLUDE_IMAGE }} \
               --print-recipe \
+              --disable-fakemachine \
               debos-recipes/qualcomm-linux-debian-rootfs.yaml
 
       - name: Apply arduino specific overlays
