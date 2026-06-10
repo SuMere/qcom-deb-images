@@ -9,7 +9,7 @@ env:
   GIT_BRANCH_KERNEL: qcom-v7.0.0-unoq
   GIT_REPO_UBOOT: https://github.com/arduino/u-boot
   DEVICE_TREE_UBOOT: qcom/qrb2210-arduino-imola
-  OVERLAYS: arduino-unoq-releases,apt-sources,backports,qsc-deb-releases
+  OVERLAYS: arduino-unoq-releases,qsc-deb-releases
   RELEASE_DIR: debian-im
 
 on:
