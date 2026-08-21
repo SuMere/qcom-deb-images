@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-FileCopyrightText: Copyright (C) Arduino s.r.l. and/or its affiliated companies
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 INSTALL_PATH=$(dirname "$(readlink -f $0)")/..
 
 if [ $# -eq 2 ] ; then

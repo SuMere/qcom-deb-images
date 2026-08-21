@@ -514,17 +514,21 @@ This project is licensed under the [BSD-3-clause License](https://spdx.org/licen
 <!-- link targets for the CI status badges at the top of this file; each
      workflow needs two: the shields.io image and the Actions page it links to -->
 
-[qli-images]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/build.yml?query=branch%3Amain+event%3Aschedule
-[qli-images-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/build.yml?label=QLI%20images&branch=main&event=schedule
-[debian-images]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/build-debian.yml?query=branch%3Amain+event%3Aschedule
-[debian-images-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/build-debian.yml?label=Debian%20images&branch=main&event=schedule
-[linux-next]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-next.yml?query=branch%3Amain+event%3Aschedule
-[linux-next-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-next.yml?label=linux-next%20images&branch=main&event=schedule
-[mainline]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-mainline.yml?query=branch%3Amain+event%3Aschedule
-[mainline-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-mainline.yml?label=mainline%20images&branch=main&event=schedule
-[arduino]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-arduino.yml?query=branch%3Amain+event%3Aschedule
-[arduino-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-arduino.yml?label=arduino&branch=main&event=schedule
-[qcom-7.2]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-qcom-7.2.yml?query=branch%3Amain+event%3Aschedule
-[qcom-7.2-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-qcom-7.2.yml?label=qcom-7.2&branch=main&event=schedule
-[qcom-laptops]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-qcom-laptops.yml?query=branch%3Amain+event%3Aschedule
-[qcom-laptops-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-qcom-laptops.yml?label=qcom-laptops&branch=main&event=schedule
+[qcom-next]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-qcom-next.yml
+[qcom-next-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-qcom-next.yml?label=qcom-next
+[images]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/build.yml
+[images-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/build.yml?label=images
+[debian-images]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/build-debian.yml
+[debian-images-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/build-debian.yml?label=Debian%20images
+[linux-next]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-next.yml
+[linux-next-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-next.yml?label=linux-next
+[mainline]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-mainline.yml
+[mainline-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-mainline.yml?label=mainline
+[arduino]: https://github.com/qualcomm-linux/qcom-deb-images/actions/workflows/linux-arduino.yml
+[arduino-badge]: https://img.shields.io/github/actions/workflow/status/qualcomm-linux/qcom-deb-images/linux-arduino.yml?label=arduino
+
+### Third-Party Components
+
+This repository functions as an aggregate of various works. While the core recipes and scripts are BSD-licensed, some included third-party components (such as binaries, firmware, or external tools) are distributed under their own respective licenses (e.g., GPL, MIT, or proprietary).
+
+Please refer to the LICENSE, COPYING, or README files within specific subdirectories for the terms applicable to those components.
