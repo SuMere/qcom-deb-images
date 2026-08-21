@@ -10,8 +10,7 @@ architecture: arm64
 actions:
   - action: unpack
     description: Unpack root filesystem
-    compression: gz
-    file: rootfs.tar.gz
+    file: rootfs.tar
 
 {{- if ne $dtb "firmware" }}
   - action: run

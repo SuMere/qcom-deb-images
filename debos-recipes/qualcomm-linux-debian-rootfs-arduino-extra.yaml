@@ -10,8 +10,7 @@ architecture: arm64
 actions:
   - action: unpack
     description: Unpack root filesystem
-    compression: gz
-    file: rootfs.tar.gz
+    file: rootfs.tar
 
 {{- if ne $aptlocalrepo "none" }}
   - action: run
@@ -337,12 +336,12 @@ actions:
     chroot: false
     command: |
       set -eux
-      rm -f ${ARTIFACTDIR}/rootfs.tar.gz
+      rm -f ${ARTIFACTDIR}/rootfs.tar
 
   - action: pack
     description: Create root filesystem tarball
-    file: rootfs.tar.gz
-    compression: gz
+    file: rootfs.tar
+    compression: none
 
 # Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 # SPDX-License-Identifier: BSD-3-Clause
