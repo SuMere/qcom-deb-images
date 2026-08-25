@@ -4,6 +4,7 @@
 {{- $image := printf "disk-%s.img" $imagetype }}
 {{- $includecontainers := or .includecontainers "false" }}
 {{- $aptlocalrepo := or .aptlocalrepo "none" }}
+{{- $targetboard := or .targetboard "none" }}
 
 architecture: arm64
 
@@ -37,6 +38,7 @@ actions:
       apt -y upgrade
 {{- end }}
 
+{{- if eq $targetboard "unoq" }}
   - action: run
     description: Set hostname to "uno-q"
     chroot: true
@@ -45,6 +47,16 @@ actions:
       echo uno-q >/etc/hostname
       # /etc/hosts is created by netbase
       sed -i "1s/^/127.0.1.1	uno-q\n/" /etc/hosts
+{{- else if eq $targetboard "ventunoq"}}
+  - action: run
+    description: Set hostname to "ventuno-q"
+    chroot: true
+    command: |
+      set -eux
+      echo ventuno-q > /etc/hostname
+      # /etc/hosts is created by netbase
+      sed -i "1s/^/127.0.1.1	ventuno-q\n/" /etc/hosts
+{{- end }}
 
   - action: run
     description: Remove debian user
@@ -181,7 +193,15 @@ actions:
       - libwebkitgtk-doc=2.48.3-1qcom1
       - webkit2gtk-driver=2.48.3-1qcom1
       - webkitgtk-webdriver=2.48.3-1qcom1
+{{- if eq $targetboard "unoq"}}
       - arduino-unoq
+{{- else if eq $targetboard "ventunoq"}}
+      - libfastrpc1
+      - libfastrpc-dev
+      - fastrpc-support
+      - arduino-ventunoq-config
+      - arduino-ventunoq
+{{- end }}
       - onboard
 
   - action: run
@@ -191,7 +211,11 @@ actions:
       set -eux
       # re-resolve arduino-unoq's deps so the pins from arduino-unoq-config apply
       apt-get -y update
+{{- if eq $targetboard "unoq"}}
       deps=$(apt-cache depends arduino-unoq | awk '/Depends:/ {print $2}')
+{{- else if eq $targetboard "ventunoq"}}
+      deps=$(apt-cache depends arduino-ventunoq | awk '/Depends:/ {print $2}')
+{{- end }}
       auto_before=$(apt-mark showauto $deps)
       apt-get -y --allow-downgrades install $deps
       [ -n "$auto_before" ] && apt-mark auto $auto_before
@@ -342,7 +366,7 @@ actions:
       echo "Home size (KiB): $HOME_SIZE"
       echo "Boot size (KiB): $BOOT_SIZE"
       echo "Root size (KiB): $ROOT_SIZE"
-  
+
   - action: run
     description: Print OS version
     command: |
