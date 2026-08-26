@@ -342,6 +342,15 @@ actions:
       echo "Home size (KiB): $HOME_SIZE"
       echo "Boot size (KiB): $BOOT_SIZE"
       echo "Root size (KiB): $ROOT_SIZE"
+  
+  - action: run
+    description: Print OS version
+    command: |
+      set -eux
+      OS_VERSION=`grep 'PRETTY_NAME=' /etc/os-release | cut -d'"' -f2`
+      export OS_VERSION="$OS_VERSION"
+      echo "OS_VERSION=${OS_VERSION}" >> $GITHUB_OUTPUT
+      echo "OS Version: $OS_VERSION"
 
   - action: run
     description: Remove old rootfs

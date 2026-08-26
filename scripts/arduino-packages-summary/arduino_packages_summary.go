@@ -42,7 +42,7 @@ func main() {
 	}
 
 	outFile := paths.New("arduino-summary.md")
-	outFile.WriteFile([]byte(output))
+	err = outFile.WriteFile([]byte(output))
 	if err != nil {
 		println(err.Error())
 		os.Exit(1)
