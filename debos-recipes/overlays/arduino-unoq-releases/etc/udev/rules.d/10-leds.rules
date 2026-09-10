@@ -1,2 +1,0 @@
-SUBSYSTEM=="leds", ACTION=="add", RUN+="/bin/chgrp -R gpiod /sys%p", RUN+="/bin/chmod -R g=u /sys%p"
-SUBSYSTEM=="leds", ACTION=="change", RUN+="/bin/chgrp -R gpiod /sys%p", RUN+="/bin/chmod -R g=u /sys%p"
