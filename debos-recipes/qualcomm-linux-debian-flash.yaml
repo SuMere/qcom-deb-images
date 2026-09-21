@@ -15,10 +15,10 @@ architecture: arm64
 actions:
   - action: download
     description: Download qcom-ptool
-    url: https://github.com/qualcomm-linux/qcom-ptool/archive/80e52fcde1cbae7d725692dea98a27cb479c5a2c.tar.gz
+    url: http://github.com/qualcomm-linux/qcom-ptool/archive/3388d0096c52aaf30a0c589db880baefc1824017.tar.gz
     name: qcom-ptool
     filename: qcom-ptool.tar.gz
-    sha256sum: 4fe113e20fa8feffdd962612f17cb03e60e6e7f460738bbcf897c7c9c631ad06
+    sha256sum: 39b144480bff3170ab35f2ccce23a83fe3a799d3fb752a51576711ddb1a9eccd
     unpack: true
 
   - action: download
@@ -438,7 +438,7 @@ actions:
 {{- $boards = append $boards (dict
     "name" "qrb2210-arduino-imola"
     "soc_id" "qcm2290"
-    "ptool_platforms" (list "qrb2210-unoq/emmc-16GB")
+    "ptool_platforms" (list "qrb2210-unoq-abl/emmc-16GB-arduino")
     "boot_binaries_download" (dict
         "description" "UNO Q boot binaries"
         "url" "https://downloads.arduino.cc/debian-im/unoq-bootloader-emmc-linux-251020.zip"
@@ -628,12 +628,6 @@ actions:
           echo "Skipping board ${board_name}: not in target list"
       fi
 
-      # set skip_board if board dtb isn't present
-      if ! grep -Fxq "$board_dtb" "${dtbs_file}"; then
-          skip_board=true
-          echo "Skipping board ${board_name}: dtb ${board_dtb} not available"
-      fi
-
       # set skip_board if this is a multidtb board but its per-SoC FIT wasn't
       # produced above
       if [ "${board_dtb_bin_type}" = multidtb ] &&
@@ -764,6 +758,10 @@ actions:
               mkfs.vfat -S 4096 -C "${dtb_bin}" 4096
               # extract board device tree from the root filesystem provided
               # tarball
+              if ! grep -Fxq "$board_dtb" "${dtbs_file}"; then
+                  echo "Skipping board ${board_name}: $board_dtb not available in dtbs.tar.gz"
+                  continue
+              fi
               tar -C build -xvf "${ARTIFACTDIR}/dtbs.tar.gz" "$board_dtb"
               # copy into the FAT as combined-dtb.dtb
               mcopy -vmp -i "${dtb_bin}" "build/${board_dtb}" ::/combined-dtb.dtb
