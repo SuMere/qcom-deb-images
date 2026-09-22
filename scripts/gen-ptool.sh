@@ -33,15 +33,18 @@ case "$DISK_TYPE" in
   emmc|nvme)
     esp="../disk-sdcard.img1"
     rootfs="../disk-sdcard.img2"
+    userdata="../disk-sdcard.img3"
     ;;
   ufs)
     esp="../disk-ufs.img1"
     rootfs="../disk-ufs.img2"
+    userdata="../disk-ufs.img3"
     ;;
   spinor)
     # spinor carries firmware only; no OS efi/rootfs partitions
     esp=""
     rootfs=""
+    userdata=""
     ;;
   *)
     echo "unsupported disk type $DISK_TYPE"
@@ -81,6 +84,7 @@ partition_map="${partition_map},dtb_a=${dtb}"
 partition_map="${partition_map},dtb_b=${dtb}"
 partition_map="${partition_map},efi=${esp}"
 partition_map="${partition_map},rootfs=${rootfs}"
+partition_map="${partition_map},userdata=${userdata}"
 
 # qcom-ptool ships as the "qcom_ptool" Python package; run its scripts as
 # modules with the tree root on PYTHONPATH so intra-package imports resolve
