@@ -4,6 +4,7 @@
 {{- $imagetype := or .imagetype "ufs" }}
 {{- $image := printf "disk-%s.img" $imagetype }}
 {{- $includecontainers := or .includecontainers "false" }}
+{{- $targetboard := or .targetboard "none" }}
 
 architecture: arm64
 
@@ -40,6 +41,7 @@ actions:
         fs: ext4
         size: {{ $rootsize }}
         fsck: true
+{{- if eq $targetboard "unoq" }}
       - name: home
         # Linux home partition
         parttype: 933ac7e1-2eb4-4f13-bf2c-170d0f8b3d7e
@@ -47,6 +49,7 @@ actions:
         fs: ext4
         size: {{ $homesize }}
         fsck: true
+{{- end }}
     mountpoints:
       - mountpoint: /boot/efi/
         partition: esp
@@ -62,8 +65,10 @@ actions:
           - iocharset=iso8859-1
           - shortname=mixed
           - errors=remount-ro
+{{- if eq $targetboard "unoq" }}
       - mountpoint: /home/arduino/
         partition: home
+{{- end }}
       - mountpoint: /
         partition: root
 
