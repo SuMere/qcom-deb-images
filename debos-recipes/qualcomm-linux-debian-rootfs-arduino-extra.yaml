@@ -354,10 +354,14 @@ actions:
       HOME_SIZE=`du -s $ROOTDIR/home/ | cut -f1`
       BOOT_SIZE=`du -s $ROOTDIR/boot/ | cut -f1`
       ROOT_SIZE=`du -s $ROOTDIR/ | cut -f1`
+{{- if eq $targetboard "unoq" }}
       ROOT_SIZE=$((ROOT_SIZE - BOOT_SIZE - HOME_SIZE))
-      # Increase all sizes by 20% to leave some free space for journal
-      export HOME_SIZE=$((HOME_SIZE + HOME_SIZE / 5))KB
-      export ROOT_SIZE=$((ROOT_SIZE + ROOT_SIZE / 5))KB
+{{- else if eq $targetboard "ventunoq"}}
+      ROOT_SIZE=$((ROOT_SIZE - BOOT_SIZE + HOME_SIZE))
+{{- end }}
+      # Increase all sizes by 33% to leave some free space for journal
+      export HOME_SIZE=$((HOME_SIZE + HOME_SIZE / 3))KB
+      export ROOT_SIZE=$((ROOT_SIZE + ROOT_SIZE / 3))KB
       export BOOT_SIZE=${BOOT_SIZE}KB
       echo "ROOT_SIZE=${ROOT_SIZE}" >> $GITHUB_OUTPUT
       echo "BOOT_SIZE=${BOOT_SIZE}" >> $GITHUB_OUTPUT
