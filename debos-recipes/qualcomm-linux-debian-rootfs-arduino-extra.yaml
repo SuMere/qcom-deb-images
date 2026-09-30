@@ -211,11 +211,7 @@ actions:
       set -eux
       # re-resolve arduino-unoq's deps so the pins from arduino-unoq-config apply
       apt-get -y update
-{{- if eq $targetboard "unoq"}}
-      deps=$(apt-cache depends arduino-unoq | awk '/Depends:/ {print $2}')
-{{- else if eq $targetboard "ventunoq"}}
-      deps=$(apt-cache depends arduino-ventunoq | awk '/Depends:/ {print $2}')
-{{- end }}
+      deps=$(apt-cache depends arduino-{{$targetboard}} | awk '/Depends:/ {print $2}')
       auto_before=$(apt-mark showauto $deps)
       apt-get -y --allow-downgrades install $deps
       [ -n "$auto_before" ] && apt-mark auto $auto_before
@@ -292,7 +288,7 @@ actions:
       /usr/sbin/dockerd --containerd=/run/containerd/containerd.sock --iptables=false --bridge=none &
       sleep 20
       # preload only UNO Q container images
-      echo '{"board_name":"unoq", "fqbn":"arduino:zephyr:unoq"}' > /var/lib/arduino-app-cli/platform.json
+      echo '{"board_name": "{{$targetboard}}", "fqbn" :"arduino:zephyr:{{$targetboard}}"}' > /var/lib/arduino-app-cli/platform.json
       export ARDUINO_DIRECTORIES_DATA=/home/arduino/.arduino15 \
       && export ARDUINO_APP_CLI__ALLOW_ROOT=true \
       && /usr/bin/arduino-app-cli system init
