@@ -268,7 +268,7 @@ actions:
       /usr/sbin/dockerd --containerd=/run/containerd/containerd.sock --iptables=false --bridge=none &
       sleep 20
       # preload only UNO Q container images
-      echo '{"board_name": "unoq"}' > /var/lib/arduino-app-cli/platform.json
+      echo '{"board_name":"unoq", "fqbn":"arduino:zephyr:unoq"}' > /var/lib/arduino-app-cli/platform.json
       export ARDUINO_DIRECTORIES_DATA=/home/arduino/.arduino15 \
       && export ARDUINO_APP_CLI__ALLOW_ROOT=true \
       && /usr/bin/arduino-app-cli system init
