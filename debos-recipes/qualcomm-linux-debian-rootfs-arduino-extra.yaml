@@ -217,26 +217,6 @@ actions:
       [ -n "$auto_before" ] && apt-mark auto $auto_before
 
   - action: run
-    description: Pre-install the core for the micro
-    chroot: true
-    command: |
-      export ARDUINO_DIRECTORIES_DATA=/home/arduino/.arduino15 \
-      && arduino-cli core install arduino:zephyr \
-      && arduino-cli cache clean
-
-  - action: run
-    description: Optimize toolchain
-    chroot: true
-    command: |
-      set -eux
-      export TOOLCHAIN=/home/arduino/.arduino15/packages/zephyr/tools/arm-zephyr-eabi/1.0.1
-      find $TOOLCHAIN | grep "arm/v5" | xargs rm -rf
-      find $TOOLCHAIN | grep "thumb/v6" | xargs rm -rf
-      find $TOOLCHAIN | grep "thumb/v7" | xargs rm -rf
-      find $TOOLCHAIN | grep "thumb/nofp" | xargs rm -rf
-      find $TOOLCHAIN | grep "thumb/v8.1-m.main" | xargs rm -rf
-
-  - action: run
     description: Add bash completions
     chroot: true
     command: |
@@ -295,6 +275,18 @@ actions:
       rm -f /var/lib/arduino-app-cli/platform.json
       rm -rf /home/arduino/.docker
 {{- end }}
+
+  - action: run
+    description: Optimize toolchain
+    chroot: true
+    command: |
+      set -eux
+      export TOOLCHAIN=/home/arduino/.arduino15/packages/zephyr/tools/arm-zephyr-eabi/1.0.1
+      find $TOOLCHAIN | grep "arm/v5" | xargs rm -rf
+      find $TOOLCHAIN | grep "thumb/v6" | xargs rm -rf
+      find $TOOLCHAIN | grep "thumb/v7" | xargs rm -rf
+      find $TOOLCHAIN | grep "thumb/nofp" | xargs rm -rf
+      find $TOOLCHAIN | grep "thumb/v8.1-m.main" | xargs rm -rf
 
   - action: run
     description: Chown home directory
