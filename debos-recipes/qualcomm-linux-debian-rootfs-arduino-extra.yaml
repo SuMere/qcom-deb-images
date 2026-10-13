@@ -335,6 +335,15 @@ actions:
       mkdir -p /var/lib/systemd/timesync
       touch /var/lib/systemd/timesync/clock
 
+{{- if eq $targetboard "unoq" }}
+  - action: run
+    description: Remove fastrpc packages
+    chroot: true
+    command: |
+      set -eux
+      apt remove -y fastrpc* || true
+{{- end }}
+
   - action: run
     description: Find partitions minimal sizes
     command: |
